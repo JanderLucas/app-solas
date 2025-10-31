@@ -2,9 +2,10 @@ const form = document.getElementById('form');
 const tabela = document.querySelector('#tabela tbody');
 const exportarBtn = document.getElementById('exportar');
 const limparBtn = document.getElementById('limpar');
+const adicionarNumeracaoBtn = document.getElementById('adicionarNumeracao');
+const numeracoesLista = document.getElementById('numeracoes-lista');
 const filtroProduto = document.getElementById('filtroProduto');
 const filtroCor = document.getElementById('filtroCor');
-const filtroItem = document.getElementById('filtroItem');
 
 let registros = JSON.parse(localStorage.getItem('registros')) || [];
 
@@ -17,81 +18,90 @@ function formatarNumeracao(valor) {
 }
 
 function gerarItem(produto, cor, numeracao) {
-  return `${produto.toUpperCase()}${cor.toUpperCase()}${numeracao}`;
+  return `${produto}${cor.toUpperCase()}${numeracao}`;
 }
 
 function atualizarTabela() {
   tabela.innerHTML = '';
+  const fp = filtroProduto.value.trim().toUpperCase();
+  const fc = filtroCor.value.trim().toUpperCase();
 
-  const filtroP = filtroProduto.value.trim().toUpperCase();
-  const filtroC = filtroCor.value.trim().toUpperCase();
-  const filtroI = filtroItem.value.trim().toUpperCase();
-
-  registros
+  const registrosFiltrados = registros
+    .map((r, index) => ({ ...r, realIndex: index }))
     .filter(r =>
-      (!filtroP || r.produto.includes(filtroP)) &&
-      (!filtroC || r.cor.includes(filtroC)) &&
-      (!filtroI || r.item.includes(filtroI))
-    )
-    .forEach((item, i) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${item.produto}</td>
-        <td>${item.cor}</td>
-        <td>${item.numeracao}</td>
-        <td>${item.item}</td>
-        <td>
-          <div class="quantidade-controles">
-            <button onclick="alterarQtd(${i}, -1)">-</button>
-            <span>${item.quantidade}</span>
-            <button onclick="alterarQtd(${i}, 1)">+</button>
-          </div>
-        </td>
-        <td>
-          <button class="btn-editar" onclick="editarRegistro(${i})">✏️ Editar</button>
-          <button class="btn-excluir" onclick="excluirRegistro(${i})">Excluir</button>
-        </td>
-      `;
-      tabela.appendChild(tr);
-    });
+      (!fp || r.produto.includes(fp)) &&
+      (!fc || r.cor.includes(fc))
+    );
+
+  registrosFiltrados.forEach((item) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${item.produto}</td>
+      <td>${item.cor}</td>
+      <td>${item.numeracao}</td>
+      <td>
+        <div class="quantidade-controles">
+          <button onclick="alterarQtd(${item.realIndex}, -1)">-</button>
+          <span>${item.quantidade}</span>
+          <button onclick="alterarQtd(${item.realIndex}, 1)">+</button>
+        </div>
+      </td>
+      <td>${item.item}</td>
+      <td>
+        <button class="btn-editar" onclick="editarRegistro(${item.realIndex})">✏️</button>
+        <button class="btn-excluir" onclick="excluirRegistro(${item.realIndex})">🗑️</button>
+      </td>`;
+    tabela.appendChild(tr);
+  });
 }
+
+adicionarNumeracaoBtn.addEventListener('click', () => {
+  const div = document.createElement('div');
+  div.className = 'numeracao-linha';
+  div.innerHTML = `
+    <input type="number" class="numeracao" placeholder="Numeração" max="999" required />
+    <input type="number" class="quantidade" placeholder="Qtd" min="1" required />
+    <button type="button" class="remover">❌</button>
+  `;
+  div.querySelector('.remover').addEventListener('click', () => div.remove());
+  numeracoesLista.appendChild(div);
+});
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
-  const produto = document.getElementById('produto').value.trim().toUpperCase();
+  const produto = document.getElementById('produto').value.trim();
   const cor = document.getElementById('cor').value.trim().toUpperCase();
-  let numeracao = document.getElementById('numeracao').value.trim();
-  const quantidade = parseInt(document.getElementById('quantidade').value);
+  const linhas = document.querySelectorAll('.numeracao-linha');
 
-  if (!produto || !cor || !numeracao || !quantidade)
-    return alert('Preencha todos os campos.');
-
-  if (produto.length > 5) return alert('Produto: máximo 5 caracteres.');
-  if (cor.length > 5) return alert('Cor: máximo 5 caracteres.');
-  if (numeracao.length > 3) return alert('Numeração: máximo 3 dígitos.');
-  if (quantidade < 1) return alert('Quantidade deve ser positiva.');
-
-  numeracao = formatarNumeracao(numeracao);
-  const item = gerarItem(produto, cor, numeracao);
-
-  const existente = registros.find(r => r.item === item);
-  if (existente) {
-    const confirmar = confirm(
-      `O item "${item}" já existe.\nDeseja somar ${quantidade} à quantidade atual (${existente.quantidade})?`
-    );
-    if (confirmar) {
-      existente.quantidade += quantidade;
-    } else {
-      alert('Item duplicado não adicionado.');
-      return;
-    }
-  } else {
-    registros.push({ produto, cor, numeracao, item, quantidade });
+  if (!produto || !cor || linhas.length === 0) {
+    alert('Preencha todos os campos e adicione pelo menos uma numeração.');
+    return;
   }
+
+  if (produto.length > 5) return alert('Produto: máximo 5 dígitos.');
+  if (isNaN(produto)) return alert('Produto deve conter apenas números.');
+  if (cor.length > 5) return alert('Cor: máximo 5 caracteres.');
+
+  linhas.forEach(linha => {
+    let numeracao = linha.querySelector('.numeracao').value.trim();
+    let quantidade = parseInt(linha.querySelector('.quantidade').value);
+    if (!numeracao || quantidade < 1) return;
+    numeracao = formatarNumeracao(numeracao);
+    const item = gerarItem(produto, cor, numeracao);
+
+    const existente = registros.find(r => r.item === item);
+    if (existente) {
+      const confirmar = confirm(`O item "${item}" já existe. Deseja somar ${quantidade} à quantidade atual (${existente.quantidade})?`);
+      if (confirmar) existente.quantidade += quantidade;
+    } else {
+      registros.push({ produto, cor, numeracao, item, quantidade });
+    }
+  });
 
   localStorage.setItem('registros', JSON.stringify(registros));
   atualizarTabela();
   form.reset();
+  numeracoesLista.innerHTML = '';
 });
 
 function alterarQtd(i, delta) {
@@ -104,7 +114,7 @@ function alterarQtd(i, delta) {
 function editarRegistro(index) {
   const registro = registros[index];
   const produto = prompt('Editar Produto:', registro.produto);
-  if (!produto || produto.length > 5) return alert('Produto inválido.');
+  if (!produto || produto.length > 5 || isNaN(produto)) return alert('Produto inválido.');
 
   const cor = prompt('Editar Cor:', registro.cor);
   if (!cor || cor.length > 5) return alert('Cor inválida.');
@@ -147,8 +157,5 @@ exportarBtn.addEventListener('click', () => {
   XLSX.writeFile(wb, 'registros_CO_R.xlsx');
 });
 
-[filtroProduto, filtroCor, filtroItem].forEach(el =>
-  el.addEventListener('input', atualizarTabela)
-);
-
+[filtroProduto, filtroCor].forEach(el => el.addEventListener('input', atualizarTabela));
 atualizarTabela();
