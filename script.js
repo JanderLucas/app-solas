@@ -59,7 +59,7 @@ adicionarNumeracaoBtn.addEventListener('click', () => {
   const div = document.createElement('div');
   div.className = 'numeracao-linha';
   div.innerHTML = `
-    <input type="number" class="numeracao" placeholder="Numeração" max="999" required />
+    <input type="number" class="numeracao" placeholder="Num" max="999" required />
     <input type="number" class="quantidade" placeholder="Qtd" min="1" required />
     <button type="button" class="remover">❌</button>
   `;
@@ -159,3 +159,4 @@ exportarBtn.addEventListener('click', () => {
 
 [filtroProduto, filtroCor].forEach(el => el.addEventListener('input', atualizarTabela));
 atualizarTabela();
+
