@@ -3,57 +3,67 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Registro de Produtos - Setor sobra e perda</title>
-
+  <title>Controle CO R</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <h1>📋 Registro de Produtos - Setor sobra e perda</h1>
+    <h1>Gerenciador de Produtos</h1>
   </header>
 
-  <form id="form">
-    <label for="produto">Produto:</label>
-    <input type="text" id="produto" maxlength="5" required placeholder="Ex: 05320" />
+  <main>
+    <form id="form">
+      <div class="campos-principais">
+        <div class="form-group">
+          <label for="produto">Produto:</label>
+          <input type="number" id="produto" maxlength="5" required placeholder="Ex: 05320" />
+        </div>
 
-    <label for="cor">Cor:</label>
-    <input type="text" id="cor" maxlength="5" required placeholder="Ex: 09064" />
+        <div class="form-group">
+          <label for="cor">Cor:</label>
+          <input type="text" id="cor" maxlength="5" required placeholder="Ex: 09064" />
+        </div>
+      </div>
 
-    <label for="numeracao">Numeração:</label>
-    <input type="number" id="numeracao" max="999" required placeholder="Ex: 334" />
+      <div id="numeracoes-container">
+        <h3>Numerações e Quantidades</h3>
+        <div id="numeracoes-lista"></div>
+        <button type="button" id="adicionarNumeracao" class="btn-secundario">➕ Adicionar Numeração</button>
+      </div>
 
-    <label for="quantidade">Quantidade:</label>
-    <input type="number" id="quantidade" min="1" required placeholder="Ex: 12" />
+      <button type="submit" id="salvar" class="btn-principal">💾 Salvar</button>
+    </form>
 
-    <button type="submit" id="adicionar">➕ Adicionar Registro</button>
-  </form>
+    <div class="acoes-superiores">
+      <button id="exportar" class="btn-info">📤 Exportar Excel</button>
+      <button id="limpar" class="btn-perigo">🧹 Limpar Tudo</button>
+    </div>
 
-  <div class="acoes-superiores">
-    <button id="exportar">📦 Exportar Excel</button>
-    <button id="limpar">🧹 Limpar Registros</button>
-  </div>
+    <div class="filtros">
+      <input type="text" id="filtroProduto" placeholder="Filtrar por produto..." />
+      <input type="text" id="filtroCor" placeholder="Filtrar por cor..." />
+    </div>
 
-  <div class="filtros">
-    <input type="text" id="filtroProduto" placeholder="Filtrar Produto..." />
-    <input type="text" id="filtroCor" placeholder="Filtrar Cor..." />
-    <input type="text" id="filtroItem" placeholder="Filtrar Item..." />
-  </div>
+    <div class="tabela-container">
+      <table id="tabela">
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Cor</th>
+            <th>Numeração</th>
+            <th>Quantidade</th>
+            <th>Item</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </main>
 
-  <div class="tabela-container">
-    <table id="tabela">
-      <thead>
-        <tr>
-          <th>Produto</th>
-          <th>Cor</th>
-          <th>Numeração</th>
-          <th>Item</th>
-          <th>Quantidade</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+  <footer>
+    <p>© 2025 - Sistema de Controle de Produtos</p>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="script.js"></script>
