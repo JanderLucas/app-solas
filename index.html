@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cadastro de pares de sobra e perda</title>
+  <meta name="theme-color" content="#0078d7" />
+  <title>Controle de Produtos</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <h1>Gerenciador de Produtos</h1>
+    <h1>Controle de Produtos</h1>
   </header>
 
   <main>
-    <form id="form">
+    <form id="form" autocomplete="off">
       <div class="campos-principais">
         <div class="form-group">
           <label for="produto">Produto:</label>
@@ -22,6 +23,11 @@
         <div class="form-group">
           <label for="cor">Cor:</label>
           <input type="text" id="cor" maxlength="5" required placeholder="Ex: 09064" />
+        </div>
+
+        <div class="form-group">
+          <label for="fabrica">Fábrica:</label>
+          <input type="text" id="fabrica" readonly placeholder="Auto preenchido" />
         </div>
       </div>
 
@@ -39,11 +45,24 @@
       <button id="limpar" class="btn-perigo">🧹 Limpar Tudo</button>
     </div>
 
+    <!-- Filtros -->
     <div class="filtros">
-      <input type="text" id="filtroProduto" placeholder="Filtrar por produto..." />
-      <input type="text" id="filtroCor" placeholder="Filtrar por cor..." />
+      <div class="filtro-wrapper">
+        <input type="text" id="filtroProduto" placeholder="Filtrar por produto..." />
+        <button type="button" class="limpar-filtro" data-alvo="filtroProduto">✖</button>
+      </div>
+      <div class="filtro-wrapper">
+        <input type="text" id="filtroCor" placeholder="Filtrar por cor..." />
+        <button type="button" class="limpar-filtro" data-alvo="filtroCor">✖</button>
+      </div>
     </div>
 
+    <!-- Contador -->
+    <div id="contador-caixas">
+      📦 Total de caixas registradas: <span id="total-caixas">0</span>
+    </div>
+
+    <!-- Tabela -->
     <div class="tabela-container">
       <table id="tabela">
         <thead>
@@ -53,6 +72,7 @@
             <th>Numeração</th>
             <th>Quantidade</th>
             <th>Item</th>
+            <th>Fábrica</th>
             <th>Ações</th>
           </tr>
         </thead>
@@ -65,8 +85,40 @@
     <p>© 2025 - Sistema de Controle de Produtos</p>
   </footer>
 
+  <!-- Modais -->
+  <div id="modal-edicao" class="modal">
+    <div class="modal-conteudo">
+      <h3>Editar Registro</h3>
+      <form id="form-edicao">
+        <label>Produto:</label>
+        <input type="number" id="edit-produto" maxlength="5" required />
+        <label>Cor:</label>
+        <input type="text" id="edit-cor" maxlength="5" required />
+        <label>Numeração:</label>
+        <input type="number" id="edit-numeracao" maxlength="3" required />
+        <label>Quantidade:</label>
+        <input type="number" id="edit-quantidade" min="1" required />
+        <div class="modal-acoes">
+          <button type="submit" class="btn-principal">Salvar</button>
+          <button type="button" id="cancelarEdicao" class="btn-perigo">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-excluir" class="modal">
+    <div class="modal-conteudo">
+      <h3>Confirmar Exclusão</h3>
+      <p id="texto-exclusao"></p>
+      <div class="modal-acoes">
+        <button id="confirmarExclusao" class="btn-perigo">Excluir</button>
+        <button id="cancelarExclusao" class="btn-secundario">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
-
