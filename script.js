@@ -320,8 +320,19 @@ window.addEventListener('click', (e) => {
   input.addEventListener('input', atualizarTabela);
 });
 
+document.querySelectorAll('.limpar-filtro').forEach(botao => {
+  botao.addEventListener('click', () => {
+    const input = botao.previousElementSibling;
+    if (input) {
+      input.value = '';
+      input.dispatchEvent(new Event('input')); // Atualiza a tabela após limpar
+    }
+  });
+});
+
 // === Inicialização ===
 carregarBaseFabrica().then(() => {
   atualizarTabela();
   atualizarContadorCaixas();
 });
+
